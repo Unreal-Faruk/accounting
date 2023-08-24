@@ -1,24 +1,24 @@
-const connection = require('../db');
+const db = require('../db'); 
 
 class Person {
-    static getAll(callback) {
-        connection.query('SELECT * FROM people', callback);
+    static getAll() {
+        return db.promise().query('SELECT * FROM people');
     }
 
-    static create(newPerson, callback) {
-        connection.query('INSERT INTO people SET ?', newPerson, callback);
+    static create(newPerson) {
+        return db.promise().query('INSERT INTO people SET ?', [newPerson]);
     }
 
-    static getById(id, callback) {
-        connection.query('SELECT * FROM people WHERE id = ?', [id], callback);
+    static getById(id) {
+        return db.promise().query('SELECT * FROM people WHERE id = ?', [id]);
     }
 
-    static update(id, updatedPerson, callback) {
-        connection.query('UPDATE people SET ? WHERE id = ?', [updatedPerson, id], callback);
+    static update(id, updatedPerson) {
+        return db.promise().query('UPDATE people SET ? WHERE id = ?', [updatedPerson, id]);
     }
 
-    static delete(id, callback) {
-        connection.query('DELETE FROM people WHERE id = ?', [id], callback);
+    static delete(id) {
+        return db.promise().query('DELETE FROM people WHERE id = ?', [id]);
     }
 }
 
