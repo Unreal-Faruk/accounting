@@ -12,6 +12,14 @@ app.use(bodyParser.json());
 const pdfRoutes = require('./routes/pdfRoutes');
 app.use('/pdf', pdfRoutes);
 
+const personRoutes = require('./routes/personRoutes');
+const caseRoutes = require('./routes/caseRoutes');
+const activityRoutes = require('./routes/activityRoutes');
+
+app.use('/people', personRoutes);
+app.use('/cases', caseRoutes);
+app.use('/activities', activityRoutes);
+
 // Start the server
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
