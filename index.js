@@ -16,7 +16,7 @@ const personRoutes = require('./routes/personRoutes');
 const caseRoutes = require('./routes/caseRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 
-app.use('/people', personRoutes);
+app.use('/persons', personRoutes);
 app.use('/cases', caseRoutes);
 app.use('/activities', activityRoutes);
 

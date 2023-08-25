@@ -27,7 +27,7 @@ class Case {
 
     static async getAll() {
         try {
-            const [rows] = await db.promise().query('SELECT * FROM cases');
+            const [rows] = await db.promise().query('SELECT * FROM Cases');
             return rows.map(row => new Case(row));
         } catch (error) {
             throw error;
@@ -36,7 +36,7 @@ class Case {
 
     static async getById(id) {
         try {
-            const [rows] = await db.promise().query('SELECT * FROM cases WHERE id = ?', [id]);
+            const [rows] = await db.promise().query('SELECT * FROM Cases WHERE id = ?', [id]);
             if (rows.length === 0) {
                 return null; // Return null if case is not found
             }
@@ -48,7 +48,7 @@ class Case {
 
     static async create(data) {
         try {
-            const result = await db.promise().query('INSERT INTO cases SET ?', [data]);
+            const result = await db.promise().query('INSERT INTO Cases SET ?', [data]);
             return result[0].insertId;
         } catch (error) {
             throw error;
@@ -57,7 +57,7 @@ class Case {
 
     static async update(id, data) {
         try {
-            const result = await db.promise().query('UPDATE cases SET ? WHERE id = ?', [data, id]);
+            const result = await db.promise().query('UPDATE Cases SET ? WHERE id = ?', [data, id]);
             return result[0].affectedRows > 0;
         } catch (error) {
             throw error;
@@ -66,7 +66,7 @@ class Case {
 
     static async delete(id) {
         try {
-            const result = await db.promise().query('DELETE FROM cases WHERE id = ?', [id]);
+            const result = await db.promise().query('DELETE FROM Cases WHERE id = ?', [id]);
             return result[0].affectedRows > 0;
         } catch (error) {
             throw error;
