@@ -61,7 +61,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-
 // Login and generate a token
 router.post('/login', async (req, res) => {
     try {
@@ -72,7 +71,9 @@ router.post('/login', async (req, res) => {
             return res.sendStatus(401); // Unauthorized
         }
 
-        const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '30m' });
+        const userId = user.id;
+
+        const token = jwt.sign({ userId, email }, process.env.SECRET_KEY, { expiresIn: '30m' });
         res.json({ token });
     } catch (error) {
         res.sendStatus(500); // Internal Server Error
