@@ -8,7 +8,7 @@ const dbConfig = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     port: process.env.DB_PORT,
-    connectionLimit: 100 // Adjust this value as needed
+    connectionLimit: 1 // Adjust this value as needed
 };
 
 const seedData = async () => {
@@ -28,7 +28,7 @@ const seedData = async () => {
      firstName VARCHAR(24) NOT NULL,
      lastName VARCHAR(24) NOT NULL,
      email VARCHAR(32) NOT NULL,
-     password VARCHAR(52) NOT NULL,
+     password VARCHAR(255) NOT NULL,
      createTime TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
  )
 `);

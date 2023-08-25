@@ -1,7 +1,13 @@
 const express = require('express');
 const User = require('../models/UserSqlModel');
 
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
 const router = express.Router();
+require('dotenv').config();
+
+const { authenticateToken } = require('../utils/token');
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -14,7 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get user by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
     try {
         const userId = req.params.id;
         const userData = await User.getById(userId);
@@ -27,19 +33,54 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Create a new user
-router.post('/', async (req, res) => {
+// Register a new user
+router.post('/register', async (req, res) => {
     try {
-        const newUser = req.body;
-        const createdUserId = await User.create(newUser);
+        const { password, email, firstName, lastName } = req.body;
+
+        // Check if the email already exists
+        const existingUser = await User.getByEmail(email);
+        if (existingUser) {
+            return res.status(400).json({ error: 'Email already exists' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Assuming User.create method supports the new fields
+        const createdUserId = await User.create({
+            password: hashedPassword,
+            email,
+            firstName,
+            lastName
+        });
+
         res.status(201).json({ id: createdUserId });
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
+
+// Login and generate a token
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.getByEmail(email);
+
+        if (!user || !await bcrypt.compare(password, user.password)) {
+            return res.sendStatus(401); // Unauthorized
+        }
+
+        const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '30m' });
+        res.json({ token });
+    } catch (error) {
+        res.sendStatus(500); // Internal Server Error
+    }
+});
+
 // Update user by ID
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const userId = req.params.id;
         const updatedUser = req.body;
@@ -51,7 +92,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete user by ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const userId = req.params.id;
         await User.delete(userId);

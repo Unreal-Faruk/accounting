@@ -31,9 +31,22 @@ class User {
         }
     }
 
+    static async getByEmail(email) {
+        try {
+            const [rows] = await db.promise().query('SELECT * FROM user WHERE email = ?', [email]);
+            if (rows.length === 0) {
+                return null;
+            }
+            return new User(rows[0]);
+        } catch (error) {
+            throw error;
+        }
+    }
+
     static async create(newUser) {
         try {
             const [result] = await db.promise().query('INSERT INTO user SET ?', newUser);
+            console.log(result)
             const createdUserId = result.insertId;
             return createdUserId;
         } catch (error) {
