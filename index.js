@@ -12,13 +12,15 @@ app.use(bodyParser.json());
 const pdfRoutes = require('./routes/pdfRoutes');
 app.use('/pdf', pdfRoutes);
 
-const personRoutes = require('./routes/personRoutes');
-const caseRoutes = require('./routes/caseRoutes');
+const userRoutes = require('./routes/userRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 const activityRoutes = require('./routes/activityRoutes');
+const priceRoutes = require('./routes/priceRoutes');
 
-app.use('/persons', personRoutes);
-app.use('/cases', caseRoutes);
+app.use('/users', userRoutes);
+app.use('/tasks', taskRoutes);
 app.use('/activities', activityRoutes);
+app.use('/prices', priceRoutes);
 
 // Start the server
 app.listen(port, () => {
