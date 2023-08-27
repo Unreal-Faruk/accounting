@@ -17,6 +17,54 @@ class Task {
         this.userId = data.userId;
     }
 
+
+    static async getAllWithActivitiesAndPrices(userId) {
+        try {
+            const query = `
+                SELECT
+                    t.*,
+                    a.date AS activityDate,
+                    a.description AS activityDescription,
+                    a.minutes AS activityMinutes,
+                    p.description AS priceDescription,
+                    p.price AS priceAmount
+                FROM task t
+                LEFT JOIN activity a ON t.id = a.taskId
+                LEFT JOIN price p ON t.id = p.taskId
+                WHERE t.userId = ?
+                ORDER BY t.id, a.date, p.id`;
+            
+            const [rows] = await db.promise().query(query, [userId]);
+
+            const tasks = {};
+            rows.forEach(row => {
+                if (!tasks[row.id]) {
+                    tasks[row.id] = new Task(row);
+                    tasks[row.id].activities = [];
+                    tasks[row.id].prices = [];
+                }
+                if (row.activityDate) {
+                    tasks[row.id].activities.push({
+                        date: row.activityDate,
+                        description: row.activityDescription,
+                        minutes: row.activityMinutes
+                    });
+                }
+                if (row.priceDescription) {
+                    tasks[row.id].prices.push({
+                        description: row.priceDescription,
+                        price: row.priceAmount
+                    });
+                }
+            });
+
+            return Object.values(tasks);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // TODO: this needs to be updated, I want to select all tasks for the authenticated user, plus I want to join all the values of the activity and price table
     static async getAll() {
         try {
             const [rows] = await db.promise().query('SELECT * FROM task');

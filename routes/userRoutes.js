@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
             return res.sendStatus(401); // Unauthorized
         }
 
-        const userId = user.id;
+        const userId = parseInt(user.id);
 
         const token = jwt.sign({ userId, email }, process.env.SECRET_KEY, { expiresIn: '30m' });
         res.json({ token });

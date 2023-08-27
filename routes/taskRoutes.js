@@ -3,15 +3,28 @@ const Task = require('../models/TaskSqlModel');
 
 const router = express.Router();
 
-// Get all tasks
-router.get('/', async (req, res) => {
+const { authenticateToken } = require('../utils/token');
+
+// Get all tasks TODO: (For the logged in user, authentiicateToken)
+// DONT JUST SEND THE TASK but send the task with all acitivities and all prices too 
+router.get('/', authenticateToken, async (req, res) => {
+    try {
+        console.log( req);
+        const userId = req.user.userId; // Assuming authenticateToken sets req.user with user information
+        const tasks = await Task.getAllWithActivitiesAndPrices(userId);
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+/*router.get('/', authentiicateToken, async (req, res) => {
     try {
         const tasks = await Task.getAll();
         res.json(tasks);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
-});
+});*/
 
 // Get task by ID
 router.get('/:id', async (req, res) => {
