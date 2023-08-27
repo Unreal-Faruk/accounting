@@ -33,7 +33,7 @@ class Task {
                 LEFT JOIN price p ON t.id = p.taskId
                 WHERE t.userId = ?
                 ORDER BY t.id, a.date, p.id`;
-            
+
             const [rows] = await db.promise().query(query, [userId]);
 
             const tasks = {};
@@ -64,16 +64,6 @@ class Task {
         }
     }
 
-    // TODO: this needs to be updated, I want to select all tasks for the authenticated user, plus I want to join all the values of the activity and price table
-    static async getAll() {
-        try {
-            const [rows] = await db.promise().query('SELECT * FROM task');
-            return rows.map(row => new Task(row));
-        } catch (error) {
-            throw error;
-        }
-    }
-
     static async getById(id) {
         try {
             const [rows] = await db.promise().query('SELECT * FROM task WHERE id = ?', [id]);
@@ -96,13 +86,50 @@ class Task {
         }
     }
 
+
+    // Update Task along with activities and prices if provided
     static async update(id, updatedTask) {
         try {
-            await db.promise().query('UPDATE task SET ? WHERE id = ?', [updatedTask, id]);
+            const { activities, prices, ...taskDetails } = updatedTask;
+
+            // Update the main task details
+            await db.promise().query('UPDATE task SET ? WHERE id = ?', [taskDetails, id]);
+
+            // Update activities and prices if they're provided
+            if (activities) {
+                for (const activity of activities) {
+                    if (activity.id) {
+                        // If activity has an ID, update existing activity
+                        await db.promise().query('UPDATE activity SET ? WHERE id = ?', [activity, activity.id]);
+                    } else {
+                        // If activity doesn't have an ID, create a new activity linked to the task
+                        await db.promise().query('INSERT INTO activity SET ?', {
+                            ...activity,
+                            taskId: id
+                        });
+                    }
+                }
+            }
+
+            if (prices) {
+                for (const price of prices) {
+                    if (price.id) {
+                        // If price has an ID, update existing price
+                        await db.promise().query('UPDATE price SET ? WHERE id = ?', [price, price.id]);
+                    } else {
+                        // If price doesn't have an ID, create a new price linked to the task
+                        await db.promise().query('INSERT INTO price SET ?', {
+                            ...price,
+                            taskId: id
+                        });
+                    }
+                }
+            }
         } catch (error) {
             throw error;
         }
     }
+
 
     static async delete(id) {
         try {
