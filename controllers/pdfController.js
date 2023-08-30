@@ -11,11 +11,12 @@ const { makeId } = require('../utils/stringUtils');
 // Function to create an individual PDF with provided template and data
 async function createPdf(template, fileName) {
     return new Promise((resolve, reject) => {
-        pdf.create(template, {}).toFile(fileName, (err, res) => {
+        pdf.create(template, {}).toFile(fileName, (err) => {
             if (err) {
                 reject(err);
+            } else {
+                resolve(fileName); // Resolve with the file name instead of res.filename
             }
-            resolve(res.filename);
         });
     });
 }
