@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": ">=16.14"
+  },
   "name": "accounting-backend",
   "version": "1.0.0",
   "description": "",
