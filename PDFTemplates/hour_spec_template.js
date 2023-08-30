@@ -1,4 +1,4 @@
-const hourSpecTemplate = (activitiesListStringHtml) => {
+const hourSpecTemplate = (body) => {
     const today = new Date();
     return `<!doctype html>
     <html>
@@ -103,10 +103,8 @@ const hourSpecTemplate = (activitiesListStringHtml) => {
                         <table>
                             <tr>
                                 <td class="title"><img src="https://i.imgur.com/GJylxm5.png"
-                                        style="width:100%; max-width:156px;"></td>
-                                <td>
-                                    Datum: ${`${today.getDate()}. ${today.getMonth() + 1}. ${today.getFullYear()}.`}
-                                </td>
+                                        style="width:100%; max-width:256px;"></td>
+    
                             </tr>
                         </table>
                     </td>
@@ -116,7 +114,8 @@ const hourSpecTemplate = (activitiesListStringHtml) => {
                         <table>
                             <tr>
                                 <td>
-                                    <p>UREN SPECIFICATIE<br>
+                                    <p>UREN SPECIFICATIE ${body.periodSelected}
+                                        <br>
                                 </td>
                             </tr>
                         </table>
@@ -124,20 +123,24 @@ const hourSpecTemplate = (activitiesListStringHtml) => {
                 </tr>
     
                 <tr class="heading">
-                    <td>Beschrijving</td>
-                    <td>Datum</td>
-                    <td>Minuten</td>
+                    <td>Description</td>
+                    <td>Date</td>
+                    <td>Minutes</td>
                 </tr>
- 
-                ${activitiesListStringHtml}
+    
+                ${body.activitiesListStringHtml}
+                <tr class="heading">
+                    <td></td>
+                    <td>Total</td>
+                    <td>${body.formattedTotalTime}</td>
+                </tr>
             </table>
             <br />
-            <h1 class="justify-center">Totaal: ... minuten</h1>
         </div>
     
     </body>
     
     </html>`;
- };
+};
 
- module.exports = hourSpecTemplate;
+module.exports = hourSpecTemplate;

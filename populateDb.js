@@ -47,6 +47,7 @@ const seedData = async () => {
      updatedTime TIMESTAMP NULL ,
      hourRate DECIMAL(10, 2) NOT NULL,
      isArchived INT NULL DEFAULT 0,
+     invoice INT NULL DEFAULT 0,
      userId INT,
      FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE ON UPDATE NO ACTION
  )
@@ -59,7 +60,7 @@ const seedData = async () => {
      description VARCHAR(255) NOT NULL,
      minutes INT NOT NULL,
      taskId INT,
-     FOREIGN KEY (taskId) REFERENCES task(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     FOREIGN KEY (taskId) REFERENCES task(id) ON DELETE CASCADE ON UPDATE NO ACTION
  )
 `);
 
@@ -68,41 +69,42 @@ const seedData = async () => {
      id INT AUTO_INCREMENT PRIMARY KEY,
      description VARCHAR(255) NOT NULL,
      price DECIMAL(10, 2) NOT NULL,
+     isPercentage INT NULL DEFAULT 0,
      taskId INT,
-     FOREIGN KEY (taskId) REFERENCES task(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     FOREIGN KEY (taskId) REFERENCES task(id) ON DELETE CASCADE ON UPDATE NO ACTION
  )
 `);
 
-        // Insert sample data
-        await connection.query(`
- INSERT INTO user (firstName, lastName, email, password)
- VALUES ('John', 'Doe', 'john@example.com', 'password123'),
-        ('Jane', 'Smith', 'jane@example.com', 'password456');
-`);
+//         // Insert sample data
+//         await connection.query(`
+//  INSERT INTO user (firstName, lastName, email, password)
+//  VALUES ('John', 'Doe', 'john@example.com', 'password123'),
+//         ('Jane', 'Smith', 'jane@example.com', 'password456');
+// `);
 
-        const [johnId, janeId] = await connection.query('SELECT id FROM user');
+//         const [johnId, janeId] = await connection.query('SELECT id FROM user');
 
-        await connection.query(`
- INSERT INTO task (title, subject, description, clientFirstName, clientLastName, clientEmail, clientAddress, hourRate, userId)
- VALUES ('Task 1', 'Subject 1', 'Description 1', 'Client John', 'Doe', 'clientjohn@example.com', '123 Main St', 50, ?),
-        ('Task 2', 'Subject 2', 'Description 2', 'Client Jane', 'Smith', 'clientjane@example.com', '456 Elm St', 75, ?);
-`, [johnId[0].id, janeId[0].id]);
+//         await connection.query(`
+//  INSERT INTO task (title, subject, description, clientFirstName, clientLastName, clientEmail, clientAddress, hourRate, userId)
+//  VALUES ('Task 1', 'Subject 1', 'Description 1', 'Client John', 'Doe', 'clientjohn@example.com', '123 Main St', 50, ?),
+//         ('Task 2', 'Subject 2', 'Description 2', 'Client Jane', 'Smith', 'clientjane@example.com', '456 Elm St', 75, ?);
+// `, [johnId[0].id, janeId[0].id]);
 
-        const [taskIds] = await connection.query('SELECT id FROM task');
+//         const [taskIds] = await connection.query('SELECT id FROM task');
 
-        for (const taskId of taskIds) {
-            await connection.query(`
- INSERT INTO activity (date, description, minutes, taskId)
- VALUES ('2023-08-01', 'Activity 1', 60, ?),
-        ('2023-08-02', 'Activity 2', 90, ?);
-`, [taskId.id, taskId.id]);
+//         for (const taskId of taskIds) {
+//             await connection.query(`
+//  INSERT INTO activity (date, description, minutes, taskId)
+//  VALUES ('2023-08-01', 'Activity 1', 60, ?),
+//         ('2023-08-02', 'Activity 2', 90, ?);
+// `, [taskId.id, taskId.id]);
 
-            await connection.query(`
- INSERT INTO price (description, price, taskId)
- VALUES ('Price 1', 100, ?),
-        ('Price 2', 150, ?);
-`, [taskId.id, taskId.id]);
-        }
+//             await connection.query(`
+//  INSERT INTO price (description, price, taskId)
+//  VALUES ('Price 1', 100, ?),
+//         ('Price 2', 150, ?);
+// `, [taskId.id, taskId.id]);
+//         }
 
         console.log('Database populated successfully');
         connection.end();

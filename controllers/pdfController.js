@@ -24,20 +24,6 @@ async function createPdf(template, fileName) {
 exports.createPdfAndSend = async (req, res) => {
     try {
 
-        // Get activities from the request body
-        const activities = req.body.activities;
-        let activitiesListStringHtml = '';
-
-        // Build HTML for activities
-        activities.forEach(activity => {
-            activitiesListStringHtml += `
-                <tr class="item">
-                    <td>${activity.description}</td>
-                    <td>${activity.date}</td>
-                    <td>${activity.minutes}</td>
-                </tr>`;
-        });
-
         // Generate unique file names for invoice and hours PDFs
         const invoiceFileName = `result-invoice-${makeId(5)}.pdf`;
         const hoursFileName = `result-hours-${makeId(5)}.pdf`;
@@ -45,7 +31,7 @@ exports.createPdfAndSend = async (req, res) => {
         // Create invoice and hours PDFs in parallel
         const [invoiceFile, hoursFile] = await Promise.all([
             createPdf(invoiceTemplate(req.body), invoiceFileName),
-            createPdf(hourSpecTemplate(activitiesListStringHtml), hoursFileName)
+            createPdf(hourSpecTemplate(req.body), hoursFileName)
         ]);
 
         // Read PDF files as buffers

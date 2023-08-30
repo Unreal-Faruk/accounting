@@ -1,4 +1,4 @@
-const invoiceTemplate = ({ name, price1, price2 }) => {
+const invoiceTemplate = (body) => {
     const today = new Date();
     return `<!doctype html>
     <html>
@@ -103,10 +103,8 @@ const invoiceTemplate = ({ name, price1, price2 }) => {
                         <table>
                             <tr>
                                 <td class="title"><img src="https://i.imgur.com/GJylxm5.png"
-                                        style="width:100%; max-width:156px;"></td>
-                                <td>
-                                    Datum: ${`${today.getDate()}. ${today.getMonth() + 1}. ${today.getFullYear()}.`}
-                                </td>
+                                        style="width:100%; max-width:256px;"></td>
+                               
                             </tr>
                         </table>
                     </td>
@@ -116,17 +114,16 @@ const invoiceTemplate = ({ name, price1, price2 }) => {
                         <table>
                             <tr>
                                 <td>
-                                    <p>NAAM ACHTERNAAM<br>
-                                        ADRES<br>
-                                        POSTCODE STAD</p>
+                                    <p>${body.clientFirstName} ${body.clientLastName}<br>
+                                        ${body.clientAddress}<br>
+                                    </p>
                                 </td>
                                 <td>
-                                    <p>TELEFOON: 020 717 31 10<br>
-                                        FAX: 020 717 31 11<br>
-                                        E-MAIL: info@arslanersoy.nl<br>
-                                        ADRES: Meer en Vaart 160<br>
-                                        1068 ZZ Amsterdam<br>Nederland<br>
-                                        INTERNET: www.arslanersoy.nl
+                                    <p>TELEFOON: ${body.businessPhone}<br>
+                                        FAX: ${body.businessFax}<br>
+                                        E-MAIL: ${body.businessEmail}<br>
+                                        ADRES: ${body.businessAddress}<br>
+                                        INTERNET: ${body.businessWebsite}
                                     </p>
                                 </td>
                             </tr>
@@ -138,10 +135,9 @@ const invoiceTemplate = ({ name, price1, price2 }) => {
                         <table>
                             <tr>
                                 <td>
-                                    <p>Declaratiedatum: ${`${today.getDate()}. ${today.getMonth() + 1}.
-                                        ${today.getFullYear()}.`}<br>
-                                        Declaratiekenmerk: Dossiernummer<br>
-                                        Zaakkenmerk: Dossiernaam<br>
+                                    <p>Declaratiedatum: ${body.invoiceDate}<br>
+                                        Declaratiekenmerk: ${body.declaratiekenmerk}<br>
+                                        Zaakkenmerk: ${body.title}<br>
                                     </p>
                                 </td>
     
@@ -157,8 +153,9 @@ const invoiceTemplate = ({ name, price1, price2 }) => {
                                 <td>
                                     <p>Ten behoeve van de door ons (te) verrichte(n) werkzaamheden in uw dossier verzoek ik
                                         u<br>
-                                        onderstaand bedrag binnen 14 dagen te voldoen op onderstaand rekeningnummer ten<br>
-                                        name van Arslan & Ersoy Advocaten onder vermelding van het declaratiekenmerk.</p>
+                                        onderstaand bedrag binnen ${body.paymentPeriode} dagen te voldoen op onderstaand
+                                        rekeningnummer ten<br>
+                                        name van ${body.businessName} onder vermelding van het declaratiekenmerk.</p>
                                 </td>
     
                             </tr>
@@ -169,34 +166,38 @@ const invoiceTemplate = ({ name, price1, price2 }) => {
                     <td>DECLARATIE</td>
                     <td>Price</td>
                 </tr>
+                ${body.priceTableString}
                 <tr class="item">
-                    <td>Honorarium:</td>
-                    <td>${price1}$</td>
+                    <td>Honorarium ${body.formattedTotalTime} - €${body.hourRate} p.u:</td>
+                    <td>€${body.totalHourCost}</td>
                 </tr>
                 <tr class="item">
-                    <td>BTW:</td>
-                    <td>${price2}$</td>
+                    <td>BTW 21%:</td>
+                    <td>€${body.btwTotal}</td>
+                </tr>
+                <tr class="heading">
+                    <td>Total</td>
+                    <td>€${body.finalPrice}</td>
                 </tr>
             </table>
             <br />
-            <h1 class="justify-center">Totaal te voldoen: ${parseInt(price1) + parseInt(price2)}$</h1>
             <div class="">
                 <table class="invoice-table">
                     <tr>
                         <th>Rekeningnummer:</th>
-                        <td>NL41 INGB 0007 0793 12</td>
+                        <td>${body.bankNumber}</td>
                     </tr>
                     <tr>
                         <th>T.n.v:</th>
-                        <td>Arslan & Ersoy Advocaten</td>
+                        <td>${body.businessName}</td>
                     </tr>
                     <tr>
                         <th>KvK-nummer:</th>
-                        <td>56320744</td>
+                        <td>${body.kvkNumber}</td>
                     </tr>
                     <tr>
                         <th>BTW-nummer:</th>
-                        <td>NL852072910.B.01</td>
+                        <td>${body.btwNumber}</td>
                     </tr>
                 </table>
             </div>

@@ -9,6 +9,12 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+const corsOptions = {
+    origin: '*',
+};
+
+app.use(cors(corsOptions));
+
 const pdfRoutes = require('./routes/pdfRoutes');
 app.use('/pdf', pdfRoutes);
 

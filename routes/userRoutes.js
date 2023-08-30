@@ -72,8 +72,11 @@ router.post('/login', async (req, res) => {
         }
 
         const userId = parseInt(user.id);
+        const firstName = user.firstName;
+        const lastName = user.lastName;
 
-        const token = jwt.sign({ userId, email }, process.env.SECRET_KEY, { expiresIn: '30m' });
+        // const token = jwt.sign({ userId, email, firstName, lastName }, process.env.SECRET_KEY, { expiresIn: '3000m' });
+        const token = jwt.sign({ userId, email, firstName, lastName }, process.env.SECRET_KEY);
         res.json({ token });
     } catch (error) {
         res.sendStatus(500); // Internal Server Error

@@ -2,6 +2,7 @@ const db = require('../db'); // Assuming you have a db.js for database connectio
 
 class Task {
     constructor(data) {
+        // Initialize the Task object with data
         this.id = data.id;
         this.title = data.title;
         this.subject = data.subject;
@@ -17,6 +18,7 @@ class Task {
         this.userId = data.userId;
     }
 
+    // Get all tasks along with activities and prices for the given user
 
     static async getAllWithActivitiesAndPrices(userId) {
         try {
@@ -64,18 +66,63 @@ class Task {
         }
     }
 
+    // Get a task by its ID along with activities and prices
     static async getById(id) {
         try {
-            const [rows] = await db.promise().query('SELECT * FROM task WHERE id = ?', [id]);
+            const query = `
+            SELECT
+                t.*,
+                a.id AS activityId,
+                a.date AS activityDate,
+                a.description AS activityDescription,
+                a.minutes AS activityMinutes,
+                p.id AS priceId,
+                p.description AS priceDescription,
+                p.price AS priceAmount,
+                p.isPercentage AS isPercentage
+            FROM task t
+            LEFT JOIN activity a ON t.id = a.taskId
+            LEFT JOIN price p ON t.id = p.taskId
+            WHERE t.id = ?
+            ORDER BY a.date, p.id`;
+
+            const [rows] = await db.promise().query(query, [id]);
+
             if (rows.length === 0) {
                 return null;
             }
-            return new Task(rows[0]);
+
+            const taskData = rows[0];
+            const task = new Task(taskData);
+            task.activities = [];
+            task.prices = [];
+
+            rows.forEach(row => {
+                if (row.activityId && !task.activities.some(activity => activity.activityId === row.activityId)) {
+                    task.activities.push({
+                        activityId: row.activityId,
+                        date: row.activityDate,
+                        description: row.activityDescription,
+                        minutes: row.activityMinutes
+                    });
+                }
+                if (row.priceId && !task.prices.some(price => price.priceId === row.priceId)) {
+                    task.prices.push({
+                        priceId: row.priceId,
+                        description: row.priceDescription,
+                        price: row.priceAmount,
+                        isPercentage: row.isPercentage
+                    });
+                }
+            });
+            return task;
         } catch (error) {
+            console.log(error)
             throw error;
         }
     }
 
+    // Create a new task
     static async create(newTask) {
         try {
             const [result] = await db.promise().query('INSERT INTO task SET ?', newTask);
@@ -86,55 +133,66 @@ class Task {
         }
     }
 
-
-    // Update Task along with activities and prices if provided
+    // Update a task along with its activities and prices if provided
     static async update(id, updatedTask) {
         try {
             const { activities, prices, ...taskDetails } = updatedTask;
-
+            console.log("-------------")
+            // console.log(taskDetails)
             // Update the main task details
-            await db.promise().query('UPDATE task SET ? WHERE id = ?', [taskDetails, id]);
+            const result = await db.promise().query('UPDATE task SET ? WHERE id = ?', [taskDetails, id]);
 
-            // Update activities and prices if they're provided
+            console.log(result)
+
+            // Update activities if provided
             if (activities) {
-                for (const activity of activities) {
-                    if (activity.id) {
-                        // If activity has an ID, update existing activity
-                        await db.promise().query('UPDATE activity SET ? WHERE id = ?', [activity, activity.id]);
-                    } else {
-                        // If activity doesn't have an ID, create a new activity linked to the task
-                        await db.promise().query('INSERT INTO activity SET ?', {
-                            ...activity,
-                            taskId: id
-                        });
-                    }
-                }
+                await this.updateActivities(id, activities);
             }
 
+            // Update prices if provided
             if (prices) {
-                for (const price of prices) {
-                    if (price.id) {
-                        // If price has an ID, update existing price
-                        await db.promise().query('UPDATE price SET ? WHERE id = ?', [price, price.id]);
-                    } else {
-                        // If price doesn't have an ID, create a new price linked to the task
-                        await db.promise().query('INSERT INTO price SET ?', {
-                            ...price,
-                            taskId: id
-                        });
-                    }
-                }
+                await this.updatePrices(id, prices);
             }
         } catch (error) {
+            console.log(error)
             throw error;
         }
     }
 
+    // Update the activities associated with a task
+    static async updateActivities(taskId, activities) {
+        for (const activity of activities) {
+            if (activity.id) {
+                await db.promise().query('UPDATE activity SET ? WHERE id = ?', [activity, activity.id]);
+            } else {
+                await db.promise().query('INSERT INTO activity SET ?', {
+                    ...activity,
+                    taskId
+                });
+            }
+        }
+    }
 
+    // Update the prices associated with a task
+    static async updatePrices(taskId, prices) {
+        for (const price of prices) {
+            if (price.id) {
+                await db.promise().query('UPDATE price SET ? WHERE id = ?', [price, price.id]);
+            } else {
+                await db.promise().query('INSERT INTO price SET ?', {
+                    ...price,
+                    taskId
+                });
+            }
+        }
+    }
+
+    // Delete a task by its ID
     static async delete(id) {
         try {
             await db.promise().query('DELETE FROM task WHERE id = ?', [id]);
         } catch (error) {
+            console.log(error)
             throw error;
         }
     }
