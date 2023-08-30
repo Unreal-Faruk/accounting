@@ -79,6 +79,7 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign({ userId, email, firstName, lastName }, process.env.SECRET_KEY);
         res.json({ token });
     } catch (error) {
+        console.log(error)
         res.sendStatus(500); // Internal Server Error
     }
 });

@@ -32,6 +32,7 @@ router.get('/', authenticateToken, async (req, res) => {
         const tasks = await Task.getAllWithActivitiesAndPrices(userId);
         res.json(tasks);
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
@@ -43,6 +44,7 @@ router.get('/:id', authenticateToken, checkTaskOwnership, async (req, res) => {
         const taskData = await Task.getById(taskId);
         res.json(taskData);
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
@@ -54,6 +56,7 @@ router.post('/', authenticateToken, async (req, res) => {
         const createdTaskId = await Task.create(newTask);
         res.status(201).json({ id: createdTaskId });
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
@@ -71,6 +74,7 @@ router.post('/:id', authenticateToken, checkTaskOwnership, async (req, res) => {
         await Task.update(taskId, updatedTask);
         res.status(200).json({ message: 'Task updated successfully' });
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
